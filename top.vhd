@@ -31,13 +31,17 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 entity top is
+	generic(
+		cnt_on  : integer := 3000000;
+		cnt_off : integer := 12000000
+	);
 	port(
 		gls_clk : in  std_logic;
 		--SPI interface
 		spi_clk : in  std_logic;        --gpio0
 		spi_din : in  std_logic;        --gpio1
 		--logic
-		intr    : out std_logic;
+		intr    : out std_logic;		--gpio2
 		--Solenoids
 		s0      : out std_logic;
 		s1      : out std_logic;
@@ -59,8 +63,8 @@ entity top is
 		s17     : out std_logic;
 		--		gpio0    : out  std_logic;       
 		--		gpio1    : out std_logic;
-		gpio2   : out std_logic;
-		gpio3   : out std_logic         --trigger
+		--		gpio2    : in  std_logic;   
+		gpio3   : in std_logic     --trigger
 	);
 end top;
 
@@ -71,27 +75,23 @@ architecture Behavioral of top is
 	-------------------------
 	-- Signals declaration --
 	-------------------------
-
-	--signal enable	: std_logic			:= '0';
-	signal good          : std_logic                     := '0';
 	signal solenoid_data : std_logic_vector(17 downto 0) := "000000000000000000";
 
 	signal trigger_in  : std_logic                    := '0';
-	signal trigger_reg : std_logic_vector(4 downto 0) := "00000";
-	signal spi_clk_reg : std_logic_vector(4 downto 0) := "00000";
-	signal spi_din_reg : std_logic_vector(4 downto 0) := "00000";
+	signal trigger_reg : std_logic_vector(3 downto 0) := "0000";
+	signal spi_clk_reg : std_logic_vector(3 downto 0) := "0000";
+--	signal spi_din_reg : std_logic_vector(4 downto 0) := "00000";
 
 	--watch dog timer
-	signal wd_cnt : std_logic_vector(23 downto 0) := "100110001001011010000000"; --989680
-	signal wd_ctr : std_logic_vector(23 downto 0) := "000000000000000000000000";
-	signal start  : std_logic                     := '0';
+	signal ctr   : std_logic_vector(23 downto 0) := "000000000000000000000000";
+	signal start : std_logic                     := '0';
+	signal oe    : std_logic                     := '0';
+--
+--	signal led0_reg     : std_logic                     := '0';
+--	signal led0_count   : std_logic_vector(23 downto 0) := "000101101110001101100000"; --0x16E360 "101101110001101100000000"; --B71B00   
+--	signal led0_counter : std_logic_vector(23 downto 0) := "000000000000000000000000";
 
-	--
-	--	signal led0_reg     : std_logic                     := '0';
-	--	signal led0_count   : std_logic_vector(23 downto 0) := "000101101110001101100000"; --0x16E360 "101101110001101100000000"; --B71B00   
-	--	signal led0_counter : std_logic_vector(23 downto 0) := "000000000000000000000000";
-
-	signal test_reg : std_logic := '0';
+--signal test_reg : std_logic := '0';
 
 begin                                   -- architecture body
 	-------------------------
@@ -120,76 +120,77 @@ begin                                   -- architecture body
 	meta : process(gls_clk)
 	begin
 		if rising_edge(gls_clk) then
-			trigger_reg <= trigger_reg(3 downto 0) & trigger_in;
-			spi_clk_reg <= spi_clk_reg(3 downto 0) & spi_clk;
-			spi_din_reg <= spi_din_reg(3 downto 0) & spi_din;
+			trigger_reg <= trigger_reg(2 downto 0) & trigger_in;
+			spi_clk_reg <= spi_clk_reg(2 downto 0) & spi_clk;
+			--spi_din_reg <= spi_din_reg(3 downto 0) & spi_din;
 		end if;
 	end process;
 
 	spi_data : process(gls_clk)
 	begin
 		if rising_edge(gls_clk) then
-			if (spi_clk_reg(4 downto 3) = "01") then --rising edge
-				solenoid_data <= solenoid_data(16 downto 0) & spi_din_reg(4);
-				test_reg      <= not test_reg;--'1';   --
+			if (spi_clk_reg(3 downto 2) = "01") then --rising edge
+				solenoid_data <= solenoid_data(16 downto 0) & spi_din;--spi_din_reg(4);
 			else
 				solenoid_data <= solenoid_data;
---				test_reg      <= '0';   --
 			end if;
 		end if;
 	end process;
 
-	watch_dog : process(gls_clk)
+	op_en : process(gls_clk)
 	begin
 		if rising_edge(gls_clk) then
-			if (trigger_reg(4 downto 3) = "01") then --rising edge	
-				start <= '1';
-				good  <= '1';
-			elsif (start = '1') then
-				if (wd_ctr = wd_cnt) then
-					wd_ctr <= (others => '0');
-					start  <= '0';
-					good   <= '0';
+			if (start = '1') then
+				if(ctr < conv_integer(cnt_on)) then
+					ctr   <= ctr + '1';
+					oe    <= '1';
+					start <= '1';					
+				elsif ((ctr >= conv_integer(cnt_on)) and (ctr < conv_integer(cnt_off))) then
+					ctr   <= ctr + '1';
+					oe    <= '0';
+					start <= '1';	
 				else
-					wd_ctr <= wd_ctr + '1';
-					start  <= '1';
-					good   <= '1';
+					ctr   <= (others => '0');
+					oe    <= '0';
+					start <= '0';
 				end if;
-			elsif (trigger_reg(4 downto 3) = "00") then
-				wd_ctr <= (others => '0');
-				start  <= '0';
-				good   <= '1';
+			else
+				oe  <= '0';
+				ctr <= (others => '0');
+				if (trigger_reg(3 downto 2) = "01") then
+					start <= '1';
+				else
+					start <= '0';
+				end if;
 			end if;
 		end if;
 	end process;
 
-	intr <= (trigger_reg(4) and good);
+	intr       <= (oe);
+	trigger_in <= gpio3;
 
-	s0 <= solenoid_data(17);             --(trigger_reg(4) and good) and solenoid_data(0);
-	s1 <= solenoid_data(16);             --(trigger_reg(4) and good) and solenoid_data(1);
-	s2 <= solenoid_data(15);             --(trigger_reg(4) and good) and solenoid_data(2);
-	s3 <= solenoid_data(14);             --(trigger_reg(4) and good) and solenoid_data(3);
-	s4 <= solenoid_data(13);             --(trigger_reg(4) and good) and solenoid_data(4);
-	s5 <= solenoid_data(12);             --(trigger_reg(4) and good) and solenoid_data(5);
+	s0 <= (oe) and solenoid_data(17);
+	s1 <= (oe) and solenoid_data(16);
+	s2 <= (oe) and solenoid_data(15);
+	s3 <= (oe) and solenoid_data(14);
+	s4 <= (oe) and solenoid_data(13);
+	s5 <= (oe) and solenoid_data(12);
 
-	s6  <= solenoid_data(11);            --(trigger_reg(4) and good) and solenoid_data(6);
-	s7  <= solenoid_data(10);            --(trigger_reg(4) and good) and solenoid_data(7);
-	s8  <= solenoid_data(9);            --(trigger_reg(4) and good) and solenoid_data(8);
-	s9  <= solenoid_data(8);            --(trigger_reg(4) and good) and solenoid_data(9);
-	s10 <= solenoid_data(7);           --(trigger_reg(4) and good) and solenoid_data(10);
-	s11 <= solenoid_data(6);           --(trigger_reg(4) and good) and solenoid_data(11);
+	s6  <= (oe) and solenoid_data(11);
+	s7  <= (oe) and solenoid_data(10);
+	s8  <= (oe) and solenoid_data(9);
+	s9  <= (oe) and solenoid_data(8);
+	s10 <= (oe) and solenoid_data(7);
+	s11 <= (oe) and solenoid_data(6);
 
-	s12 <= solenoid_data(5);           --(trigger_reg(4) and good) and solenoid_data(12);
-	s13 <= solenoid_data(4);           --(trigger_reg(4) and good) and solenoid_data(13);
-	s14 <= solenoid_data(3);           --(trigger_reg(4) and good) and solenoid_data(14);
-	s15 <= solenoid_data(2);           --(trigger_reg(4) and good) and solenoid_data(15);
-	s16 <= solenoid_data(1);           --(trigger_reg(4) and good) and solenoid_data(16);
-	s17 <= solenoid_data(0);           --(trigger_reg(4) and good) and solenoid_data(17);
+	s12 <= (oe) and solenoid_data(5);
+	s13 <= (oe) and solenoid_data(4);
+	s14 <= (oe) and solenoid_data(3);
+	s15 <= (oe) and solenoid_data(2);
+	s16 <= (oe) and solenoid_data(1);
+	s17 <= (oe) and solenoid_data(0);
 
-	--	trigger_in <= gpio3;
-	--	gpio0      <= '1';
-	--	gpio1      <= '1';
-	gpio2 <= test_reg;
-	gpio3 <= spi_din_reg(4);
+--	gpio3 <= spi_din_reg(4);
+
 end Behavioral;
 
