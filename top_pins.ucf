@@ -1,0 +1,31 @@
+#PIN MAP OF DANGEROUSPROTOTYPES.COM CPLD BREAKOUT BOARDS
+NET "gls_clk"      		LOC =  "P43";
+
+NET "intr"				LOC = "P39";
+
+NET "spi_clk"			LOC = "P29";#LOC = "P37";
+NET "spi_din"			LOC = "P30";#LOC = "P38";
+
+NET "s0"				LOC = "P41";
+NET "s1"				LOC = "P42";
+NET "s2"				LOC = "P44";
+NET "s3"				LOC = "P1";
+NET "s4"				LOC = "P2";
+NET "s5"				LOC = "P3";
+NET "s6"				LOC = "P5";
+NET "s7"				LOC = "P6";
+NET "s8"				LOC = "P7";
+NET "s9"				LOC = "P8";
+NET "s10"				LOC = "P12";
+NET "s11"				LOC = "P13";
+NET "s12"				LOC = "P22";
+NET "s13"				LOC = "P23";
+NET "s14"				LOC = "P18";
+NET "s15"				LOC = "P21";
+NET "s16"				LOC = "P14";
+NET "s17"				LOC = "P16";
+
+#NET "GPIO0"				LOC = "P29";
+#NET "GPIO1"				LOC = "P30";
+NET "GPIO2"				LOC = "P31";
+NET "GPIO3"				LOC = "P32";
