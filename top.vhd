@@ -38,10 +38,10 @@ entity top is
 	port(
 		gls_clk : in  std_logic;
 		--SPI interface
-		spi_clk : in  std_logic;        --gpio0
-		spi_din : in  std_logic;        --gpio1
+		spi_clk : in  std_logic;
+		spi_din : in  std_logic;
 		--logic
-		intr    : out std_logic;		--gpio2
+		intr    : out std_logic;
 		--Solenoids
 		s0      : out std_logic;
 		s1      : out std_logic;
