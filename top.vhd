@@ -140,7 +140,7 @@ begin                                   -- architecture body
 	begin
 		if rising_edge(gls_clk) then
 			if (start = '1') then
-				if(ctr < conv_integer(cnt_on)) then
+				if (ctr < conv_integer(cnt_on)) then
 					ctr   <= ctr + '1';
 					oe    <= '1';
 					start <= '1';
