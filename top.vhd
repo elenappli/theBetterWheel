@@ -122,7 +122,6 @@ begin                                   -- architecture body
 		if rising_edge(gls_clk) then
 			trigger_reg <= trigger_reg(2 downto 0) & trigger_in;
 			spi_clk_reg <= spi_clk_reg(2 downto 0) & spi_clk;
-			--spi_din_reg <= spi_din_reg(3 downto 0) & spi_din;
 		end if;
 	end process;
 
@@ -130,7 +129,7 @@ begin                                   -- architecture body
 	begin
 		if rising_edge(gls_clk) then
 			if (spi_clk_reg(3 downto 2) = "01") then --rising edge
-				solenoid_data <= solenoid_data(16 downto 0) & spi_din;--spi_din_reg(4);
+				solenoid_data <= solenoid_data(16 downto 0) & spi_din_reg(4);
 			else
 				solenoid_data <= solenoid_data;
 			end if;
