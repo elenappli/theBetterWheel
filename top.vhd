@@ -128,7 +128,7 @@ begin                                   -- architecture body
 	spi_data : process(gls_clk)
 	begin
 		if rising_edge(gls_clk) then
-			if (spi_clk_reg(3 downto 2) = "01") then --rising edge
+			if (spi_clk_reg(2 downto 1) = "01") then --rising edge
 				solenoid_data <= solenoid_data(16 downto 0) & spi_din_reg(4);
 			else
 				solenoid_data <= solenoid_data;
@@ -156,7 +156,7 @@ begin                                   -- architecture body
 			else
 				oe  <= '0';
 				ctr <= (others => '0');
-				if (trigger_reg(3 downto 2) = "01") then
+				if (trigger_reg(2 downto 1) = "01") then
 					start <= '1';
 				else
 					start <= '0';
