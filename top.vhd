@@ -166,7 +166,8 @@ begin                                   -- architecture body
 	end process;
 
 	intr       <= (oe);
-	trigger_in <= gpio3;
+	trigger_in <= gpio0;
+	gpio1      <= (oe);
 
 	s0 <= (oe) and solenoid_data(17);
 	s1 <= (oe) and solenoid_data(16);
@@ -189,7 +190,8 @@ begin                                   -- architecture body
 	s16 <= (oe) and solenoid_data(1);
 	s17 <= (oe) and solenoid_data(0);
 
---	gpio3 <= spi_din_reg(4);
+	gpio2 <= '0';
+	gpio3 <= '0';
 
 end Behavioral;
 
