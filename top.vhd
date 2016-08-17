@@ -189,8 +189,8 @@ begin                                   -- architecture body
 	s16 <= (oe) and solenoid_data(1);
 	s17 <= (oe) and solenoid_data(0);
 
-	gpio2 <= '0';
-	gpio3 <= '0';
+	gpio2 <= spi_clk;
+	gpio3 <= spi_din;
 
 end Behavioral;
 
