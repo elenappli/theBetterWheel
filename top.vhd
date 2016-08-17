@@ -78,8 +78,8 @@ architecture Behavioral of top is
 	signal solenoid_data : std_logic_vector(17 downto 0) := "111101010101010101";--0x15
 
 	signal trigger_in  : std_logic                    := '0';
-	signal trigger_reg : std_logic_vector(3 downto 0) := "0000";
-	signal spi_clk_reg : std_logic_vector(3 downto 0) := "0000";
+	signal trigger_reg : std_logic_vector(2 downto 0) := "000";
+	signal spi_clk_reg : std_logic_vector(2 downto 0) := "000";
 
 	--watch dog timer
 	signal ctr   : std_logic_vector(23 downto 0) := "000000000000000000000000";
@@ -119,8 +119,8 @@ begin                                   -- architecture body
 	meta : process(gls_clk)
 	begin
 		if rising_edge(gls_clk) then
-			trigger_reg <= trigger_reg(2 downto 0) & trigger_in;
-			spi_clk_reg <= spi_clk_reg(2 downto 0) & spi_clk;
+			trigger_reg <= trigger_reg(1 downto 0) & trigger_in;
+			spi_clk_reg <= spi_clk_reg(1 downto 0) & spi_clk;
 		end if;
 	end process;
 
