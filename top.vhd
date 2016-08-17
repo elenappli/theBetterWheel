@@ -75,7 +75,7 @@ architecture Behavioral of top is
 	-------------------------
 	-- Signals declaration --
 	-------------------------
-	signal solenoid_data : std_logic_vector(17 downto 0) := "000000000000010101";--0x15
+	signal solenoid_data : std_logic_vector(17 downto 0) := "111101010101010101";--0x15
 
 	signal trigger_in  : std_logic                    := '0';
 	signal trigger_reg : std_logic_vector(3 downto 0) := "0000";
