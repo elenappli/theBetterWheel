@@ -32,8 +32,8 @@ use UNISIM.VComponents.all;
 
 entity top is
 	generic(
-		cnt_on  : integer := 3000000;
-		cnt_off : integer := 12000000
+		cnt_on  : integer := 600000;    --50ms 300000;--25ms 3000000;--250ms
+		cnt_off : integer := 2400000    --200ms--1200000--100ms 12000000--1sec
 	);
 	port(
 		gls_clk : in  std_logic;
