@@ -80,7 +80,7 @@ architecture Behavioral of top is
 	signal trigger_in  : std_logic                    := '0';
 	signal trigger_reg : std_logic_vector(3 downto 0) := "0000";
 	signal spi_clk_reg : std_logic_vector(3 downto 0) := "0000";
---	signal spi_din_reg : std_logic_vector(4 downto 0) := "00000";
+	signal spi_din_reg : std_logic_vector(4 downto 0) := "00000";
 
 	--watch dog timer
 	signal ctr   : std_logic_vector(23 downto 0) := "000000000000000000000000";
@@ -143,11 +143,11 @@ begin                                   -- architecture body
 				if(ctr < conv_integer(cnt_on)) then
 					ctr   <= ctr + '1';
 					oe    <= '1';
-					start <= '1';					
+					start <= '1';
 				elsif ((ctr >= conv_integer(cnt_on)) and (ctr < conv_integer(cnt_off))) then
 					ctr   <= ctr + '1';
 					oe    <= '0';
-					start <= '1';	
+					start <= '1';
 				else
 					ctr   <= (others => '0');
 					oe    <= '0';
