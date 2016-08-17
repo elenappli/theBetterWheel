@@ -61,10 +61,10 @@ entity top is
 		s15     : out std_logic;
 		s16     : out std_logic;
 		s17     : out std_logic;
-		--		gpio0    : out  std_logic;       
-		--		gpio1    : out std_logic;
-		--		gpio2    : in  std_logic;   
-		gpio3   : in std_logic     --trigger
+		gpio0   : in  std_logic;        --trigger      
+		gpio1   : out std_logic;
+		gpio2   : out std_logic;
+		gpio3   : out std_logic
 	);
 end top;
 
